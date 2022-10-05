@@ -2,79 +2,57 @@ package grafo;
 import java.util.*;
 
 public class Grafo {
-	private Map<Integer, List<Integer>> adjVertices;
-	private boolean visited[];
-	int size = 24;
-	Integer[][] edges = {
-			{1, 5}, {1, 9}, {1, 14}, {1, 21}, {2, 3}, {2, 12},	
-			{2, 21}, {3, 10}, {3, 16},{3, 23}, {4, 7}, {4, 9},
-			{4, 15}, {4, 16}, {5, 6}, {5, 24}, {6, 13},	{6, 17}, 
-			{6,22}, {7, 8}, {7, 11}, {7, 19}, {7, 23}, {8, 22}, 
-			{10, 16}, {10, 23}, {11, 23}, {14, 18}, {15, 17}, 
-			{15, 19}, {17, 22}, {18, 24}, {20, 24} 
-	};
-	
-	public Grafo() {
-		adjVertices = new HashMap<>();
-		visited = new boolean[size+1];
-		for (int i = 0; i < size; i++) {
-			visited[i] = false;			
-		}
-		
-		for (int i = 1; i <= 24; i++) addVertex(i);
-		
-		for (int i = 0; i < edges.length; i++) {
-			if (Math.random() > 0.05)
-				addEdge(edges[i][0], edges[i][1]);
-		}	
-}
-	
-	public void addVertex(Integer id) {
-	    adjVertices.putIfAbsent(id, new ArrayList<>());
-	}
-	
-	public void addEdge(Integer v1, Integer v2) {
-	    adjVertices.get(v1).add(v2);
-	    adjVertices.get(v2).add(v1);
-	}
-	
-	public void removeEdge(Integer v1, Integer v2) {
-	    List<Integer> eV1 = adjVertices.get(v1);
-	    List<Integer> eV2 = adjVertices.get(v2);
-	    if (eV1 != null)
-	        eV1.remove(v2);
-	    if (eV2 != null)
-	        eV2.remove(v1);
-	}
-	
-	private void DFS(int vertex) {
-			 visited[vertex] = true;
+	private Integer nVertices;
+	private Set<Edge> edges;
 
-			 Iterator<Integer> ite = adjVertices.get(vertex).listIterator();
-			 while (ite.hasNext()) {
-			   int adj = ite.next();
-			   if (!visited[adj])
-			     DFS(adj);
-			 }
+	//the grafo constructor takes the number of vertices and the edges and creates the instance
+	public Grafo(Integer nVertices, Set<Edge> edges) {
+		this.nVertices = nVertices;
+		this.edges = edges;
 	}
-	
-	public boolean isConnected() {
-		
-		for (int i = 0; i < size; i++) {
-			visited[i] = false;			
-		}
-		
-		Optional<Integer> firstkey = adjVertices.keySet().stream().findAny();
-		
-		if (firstkey.isPresent())
-			DFS(firstkey.get());
-		
-		int temp = 0;
-		for (int i = 0; i < visited.length; i++) {
-			if (visited[i] == false)
-				temp += 1;
-		}
-		return temp <= 1;
+
+	//get sample method
+	public GInstance getSample() {
+		return new GInstance(nVertices, edges);
 	}
-			
+
+	//run a monte carlo simulation of the graph to find the probability of the graph being connected
+	public double[] monteCarlo(Integer nSamples, float delta) {
+		//the number of connected graphs
+		Long nConnected = 0L;
+
+		//run the monte carlo simulation
+		for (int i = 0; i < nSamples; i++) {
+			//get a sample
+			GInstance sample = getSample();
+
+			//if the sample is connected
+			if (sample.isConnected()) {
+				//increment the number of connected graphs
+				nConnected++;
+			}
+		}
+
+		//double V = nConnected*(1-nConnected)/(nSamples-1);
+		//calculate the chevyshev confidence interval
+		double beta = 1/Math.sqrt(delta);
+		double lower = (nConnected + Math.pow(beta, 2)/2 - beta * Math.sqrt(Math.pow(beta, 2)/4 + nConnected*(nSamples-nConnected)/nSamples)) / (nSamples+Math.pow(beta, 2));
+		double upper = (nConnected + Math.pow(beta, 2)/2 + beta * Math.sqrt(Math.pow(beta, 2)/4 + nConnected*(nSamples-nConnected)/nSamples)) / (nSamples+Math.pow(beta, 2));
+
+		//return the probability of the graph being connected and the confidence interval. Also return the number of connected graphs
+		return new double[]{nConnected/(double)nSamples, lower, upper, nConnected};
+	}
+
+	//parallel implementation of the monte carlo simulation
+
+
+	//return the edges
+	public Set<Edge> getEdges() {
+		return edges;
+	}
+
+	//add edge method
+	public void addEdge(Edge edge) {
+		edges.add(edge);
+	}
 }
