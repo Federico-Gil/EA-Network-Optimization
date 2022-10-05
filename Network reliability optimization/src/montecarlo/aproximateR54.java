@@ -19,7 +19,8 @@ public class aproximateR54 {
 		//create the graph
 		Grafo graph = new Grafo(nVertices, edgesSet);
 
-		double[] results = graph.monteCarlo((int) 1e5, (float) 0.05);		
+		double[] results = graph.monteCarlo((int) 1e5, (float) 0.05);
+		System.out.println(graph.distance(20, 1));		
 		
 		System.out.println("The probability of the graph being connected is: " + results[0]);
 		System.out.println("The lower bound of the confidence interval is: " + results[1]);
