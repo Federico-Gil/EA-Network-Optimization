@@ -45,13 +45,13 @@ public class Simulation {
     
     public double pi(){
         iniciarTodos();
-        long totalDentro = 0;long totalTotal = 0;
+        int totalDentro = 0;int totalTotal = 0;
             while (!threadPool.isTerminated());///Barrera
             for (SubProcess t : hilos) {
                 totalDentro += t.getCantidadDentro();
                 totalTotal += t.getCantidadTotal();
             }
-            return totalDentro / totalTotal;
+            return 1.0 * totalDentro / totalTotal;
     }
 
     public static Set<Edge> readEdges(String fileName) {
@@ -60,8 +60,8 @@ public class Simulation {
 			java.util.Scanner scanner = new java.util.Scanner(new java.io.File(fileName));
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
-				String[] parts = line.split(",");
-				edges.add(new Edge(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Float.parseFloat(parts[2])));
+				String[] parts = line.split(", ");
+				edges.add(new Edge(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Float.parseFloat(parts[2]),true));
 			}
 			scanner.close();
 		} catch (java.io.FileNotFoundException e) {

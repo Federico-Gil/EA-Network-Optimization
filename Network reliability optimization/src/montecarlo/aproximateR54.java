@@ -3,23 +3,21 @@ package montecarlo;
 import java.time.Duration;
 import java.time.Instant;
 
-import grafo.Grafo;
-import grafo.Edge;
+import grafo.*;
 
 public class aproximateR54 {
-
 	public static void main(String[] args) {
 		
 		int nVertices = 54;
 		
 		//parse the edges array into a set of edges
-		java.util.Set<Edge> edgesSet = readEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\Network reliability optimization\\data\\54-nodes.csv");
+		java.util.Set<grafo.Edge> edgesSet = readEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\Network reliability optimization\\data\\54-nodes.csv");
 		
 		Instant start = Instant.now();
 		//create the graph
 		Grafo graph = new Grafo(nVertices, edgesSet);
 
-		double[] results = graph.monteCarlo((int) 1e5, (float) 0.05);
+		double[] results = graph.monteCarlo((int) 1e6, (float) 0.05);
 		System.out.println(graph.distance(20, 1));		
 		
 		System.out.println("The probability of the graph being connected is: " + results[0]);
@@ -51,7 +49,7 @@ public class aproximateR54 {
 				//split the line into the vertices and the probability
 				String[] lineSplit = line.split(", ");
 				//add the edge to the set
-				edges.add(new Edge(Integer.parseInt(lineSplit[0]), Integer.parseInt(lineSplit[1]), Float.parseFloat(lineSplit[2])));
+				edges.add(new Edge(Integer.parseInt(lineSplit[0]), Integer.parseInt(lineSplit[1]), Float.parseFloat(lineSplit[2]),true));
 				//read the next line
 				line = reader.readLine();
 			}

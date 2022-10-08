@@ -5,41 +5,87 @@ public class Grafo {
 	private Integer nVertices;
 	private Set<Edge> edges;
 	private Map<Integer, Set<Integer>> adjacencyList;
+	private boolean[] visited;
 
 	//the grafo constructor takes the number of vertices and the edges and creates the instance
 	public Grafo(Integer nVertices, Set<Edge> edges) {
 		this.nVertices = nVertices;
-		this.edges = edges;
+		this.edges = new HashSet<>(edges);
 		this.adjacencyList = new HashMap<>();
+		this.visited = new boolean[nVertices+1];
+		
 		//create the adjacency list
-
 		for (int i = 1; i <= nVertices; i++) {
-			adjacencyList.put(i, new HashSet<>());
+            adjacencyList.put(i, new HashSet<>());
+        }
+
+		for (int i = 0; i <= nVertices; i++) {
+			visited[i] = false;			
 		}
 
-		for (Edge edge : edges) {
-			adjacencyList.get(edge.getV1()).add(edge.getV2());
-			adjacencyList.get(edge.getV2()).add(edge.getV1());
-		}
+		for (int i = 1; i <= nVertices; i++) addVertex(i);
 	}
 
-	//get sample method
-	public GInstance getSample() {
-		return new GInstance(nVertices, edges);
+	//get and set methods
+	public Integer getnVertices() {
+		return nVertices;
+	}
+
+	public Map<Integer, Set<Integer>> getAdjacencyList() {
+		return adjacencyList;
+	}
+
+	//add vertex method
+	public void addVertex(Integer vertex) {
+		adjacencyList.putIfAbsent(vertex, new HashSet<>());
+	}
+
+	/* Get sample method, it does the following:
+	 * 1. It goes through the edges and updates their existence field based on the weight of the edge
+	 * 2. It clears the adjacency list
+	 * 3. It updates the adjacency list based on the existence field of the edges
+	 * 4. It prints if the graph is connected or not
+	 */
+	public Grafo updateSample() {
+		//the weight of the edges determines the probability of the edge being in the adjacency list
+		for (Edge edge : edges) {
+			if (Math.random() > edge.getWeight()) {
+				edge.setExists(true);
+			} else {
+				edge.setExists(false);
+			}
+		}
+
+		//clear the adjacency list
+		//adjacencyList.clear();
+
+		for (int i = 1; i <= nVertices; i++) {
+            adjacencyList.get(i).clear();
+        }
+
+		//update the adjacency list based on the existence field of the edges
+		for (int i = 1; i <= nVertices; i++) addVertex(i);
+		for (Edge edge : edges) {
+			if (edge.getExists()) {
+				adjacencyList.get(edge.getV1()).add(edge.getV2());
+				adjacencyList.get(edge.getV2()).add(edge.getV1());
+			}
+		}
+		return this;
 	}
 
 	//run a monte carlo simulation of the graph to find the probability of the graph being connected
 	public double[] monteCarlo(Integer nSamples, float delta) {
 		//the number of connected graphs
-		Long nConnected = 0L;
+		int nConnected = 0;
 
 		//run the monte carlo simulation
 		for (int i = 0; i < nSamples; i++) {
 			//get a sample
-			GInstance sample = getSample();
+			updateSample();
 
 			//if the sample is connected
-			if (sample.isConnected()) {
+			if (isConnected()) {
 				//increment the number of connected graphs
 				nConnected++;
 			}
@@ -55,7 +101,31 @@ public class Grafo {
 		return new double[]{nConnected/(double)nSamples, lower, upper, nConnected};
 	}
 
-	//parallel implementation of the monte carlo simulation
+	//check if the graph is connected
+	//dfs method
+    private void dfs(int vertex) {
+        visited[vertex] = true;
+        for (int v : adjacencyList.get(vertex)) {
+            if (!visited[v]) {
+                dfs(v);
+            }
+        }
+    }
+    //method to see if the graph is connected
+    public boolean isConnected() {
+		
+		for (int i = 0; i <= nVertices; i++) {
+			visited[i] = false;			
+		}
+		
+		dfs(1);
+
+		for (int i = 1; i < visited.length; i++) {
+			if (visited[i] == false)
+				return false;
+		}
+		return true;
+	}
 
 
 	//return the edges
@@ -128,5 +198,14 @@ public class Grafo {
 
 		//return the distance of the destination vertex
 		return distance[v2]/0.05;
+	}
+
+	//funtion that returns a copy of the graph
+	public Grafo copy() {
+		Set<Edge> edgesCopy = new HashSet<>();
+		for (Edge edge : edges) {
+			edgesCopy.add(edge.copy());
+		}
+		return new Grafo(nVertices, edgesCopy);
 	}
 }

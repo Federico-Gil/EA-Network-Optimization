@@ -14,7 +14,7 @@ import grafo.Grafo;
  */
 public class SubProcess extends Thread {
 
-    public SubProcess(Random gen, long ct, Grafo g) {
+    public SubProcess(Random gen, int ct, Grafo g) {
         generador = gen;
         cantidadTotal = ct;
         this.grafo = g;
@@ -24,21 +24,29 @@ public class SubProcess extends Thread {
         return cantidadDentro;
     }
 
-    public void setCantidadDentro(long cantidadDentro) {
+    public void setCantidadDentro(int cantidadDentro) {
         this.cantidadDentro = cantidadDentro;
     }
 
     public long getCantidadTotal() {
         return cantidadTotal;
     }
+
+    public void setGenerador(Random generador) {
+        this.generador = generador;
+    }
+
+    public Random getGenerador() {
+        return generador;
+    }
     
     @Override
     public void run() {
-        cantidadDentro = Math.round(grafo.monteCarlo((int) cantidadTotal, (float) 0.05)[3]);
+        this.cantidadDentro = (int) Math.round(grafo.monteCarlo((int) cantidadTotal, (float) 0.05)[3]);
     }
     
-    private long cantidadDentro = 0;
-    private long cantidadTotal = 0;
+    private Integer cantidadDentro = 0;
+    private Integer cantidadTotal = 0;
     private Random generador = null;
     private Grafo grafo = null;
 }

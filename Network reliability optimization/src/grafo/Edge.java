@@ -4,12 +4,14 @@ public class Edge {
     //the two vertices that the edge connects and the weight of the edge
     private int v1, v2;
     private float weight;
+    private Boolean exists;
 
     //constructor
-    public Edge(int v1, int v2, float weight) {
+    public Edge(int v1, int v2, float weight, Boolean exists) {
         this.v1 = v1;
         this.v2 = v2;
         this.weight = weight;
+        this.exists = exists;
     }
 
     //getters and setters
@@ -37,26 +39,45 @@ public class Edge {
         this.weight = weight;
     }
 
+    public Boolean getExists() {
+        return exists;
+    }
+
+    public void setExists(Boolean exists) {
+        this.exists = exists;
+    }
+
     //toString method
     @Override
     public String toString() {
-        return "Edge{" +
-                "v1=" + v1 +
-                ", v2=" + v2 +
-                ", weight=" + weight +
-                '}';
+        return "Edge [v1=" + v1 + ", v2=" + v2 + ", weight=" + weight + ", exists=" + exists + "]";
     }
 
     //equals method
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Edge other = (Edge) obj;
+        if (exists == null) {
+            if (other.exists != null)
+                return false;
+        } else if (!exists.equals(other.exists))
+            return false;
+        if (v1 != other.v1)
+            return false;
+        if (v2 != other.v2)
+            return false;
+        if (Float.floatToIntBits(weight) != Float.floatToIntBits(other.weight))
+            return false;
+        return true;
+    }
 
-        Edge edge = (Edge) o;
-
-        if (v1 != edge.v1) return false;
-        if (v2 != edge.v2) return false;
-        return Float.compare(edge.weight, weight) == 0;
+	public Edge copy() {
+        return new Edge(v1, v2, weight, exists);
     }
 }

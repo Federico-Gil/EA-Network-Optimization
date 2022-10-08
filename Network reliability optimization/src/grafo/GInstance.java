@@ -39,6 +39,19 @@ public class GInstance {
         }
     }
 
+    //get and set methods
+    public Integer getnVertices() {
+        return nVertices;
+    }
+
+    public Set<Edge> getEdges() {
+        return edges;
+    }
+
+    public Map<Integer, Set<Integer>> getAdjMap() {
+        return adjMap;
+    }
+
     //add vertex method
     public void addVertex(Integer vertex) {
         adjMap.putIfAbsent(vertex, new HashSet<>());

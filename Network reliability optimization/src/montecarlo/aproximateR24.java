@@ -19,7 +19,9 @@ public class aproximateR24 {
 		//create the graph
 		Grafo graph = new Grafo(nVertices, edgesSet);
 
-		double[] results = graph.monteCarlo((int) 1e5, (float) 0.05);		
+
+
+		double[] results = graph.monteCarlo((int) 1e4, (float) 0.05);		
 		
 		System.out.println("The probability of the graph being connected is: " + results[0]);
 		System.out.println("The lower bound of the confidence interval is: " + results[1]);
@@ -50,7 +52,7 @@ public class aproximateR24 {
 				//split the line into the vertices and the probability
 				String[] lineSplit = line.split(", ");
 				//add the edge to the set
-				edges.add(new Edge(Integer.parseInt(lineSplit[0]), Integer.parseInt(lineSplit[1]), Float.parseFloat(lineSplit[2])));
+				edges.add(new Edge(Integer.parseInt(lineSplit[0]), Integer.parseInt(lineSplit[1]), Float.parseFloat(lineSplit[2]),true));
 				//read the next line
 				line = reader.readLine();
 			}

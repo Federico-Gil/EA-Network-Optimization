@@ -8,8 +8,8 @@ import grafo.Grafo;
 import grafo.Edge;
 
 public class aproximateR118 {
-
 	public static void main(String[] args) {
+		Instant start = Instant.now();
 		
 		int nVertices = 118;
 		
@@ -19,10 +19,10 @@ public class aproximateR118 {
 		Grafo graph = new Grafo(nVertices, edgesSet);
 		
 		/////////////
-		Instant start = Instant.now();
 
-		double[] results = graph.monteCarlo((int) 1e6, (float) 0.05);
-				
+		/* eps = 0.001, delta = 0.01 */
+		double[] results = graph.monteCarlo((int) 2649158, (float) 0.01);
+
 		Instant end = Instant.now();
 		/////////////
 		
@@ -49,7 +49,7 @@ public class aproximateR118 {
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
 				String[] parts = line.split(", ");
-				edges.add(new Edge(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Float.parseFloat(parts[2])));
+				edges.add(new Edge(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Float.parseFloat(parts[2]),true));
 			}
 			scanner.close();
 		} catch (java.io.FileNotFoundException e) {

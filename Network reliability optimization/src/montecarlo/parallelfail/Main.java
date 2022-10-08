@@ -10,8 +10,8 @@ public class Main {
         //time the simulation
         long startTime = System.currentTimeMillis();
         
-        Simulation sim = new Simulation(8, (int) 1e6);
-        System.out.println(sim.pi());    
+        Simulation sim = new Simulation(8, (int) 1e7);
+        System.out.println(sim.pi());
 
         long endTime = System.currentTimeMillis();
         System.out.println("That took " + (endTime - startTime) + " milliseconds");
