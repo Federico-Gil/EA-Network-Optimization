@@ -9,7 +9,7 @@ from networkx.algorithms.bipartite import color
 
 def main():
     #read the file
-    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/Network reliability optimization/data/24-nodesWc.csv"
+    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv"
     file = open(file, "r")
     #create a graph
     G = nx.Graph()
@@ -33,14 +33,14 @@ def main():
 
 
     #save the graph as an image in the same folder as the data
-    plt.savefig("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/Network reliability optimization/data/OriginalGraph.png")
+    plt.savefig("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/OriginalGraph.png")
     plt.show()
 
 
     #plt.savefig("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/Network reliability optimization/data/OriginalGraph.png")
 
     #now read other file and add the edges to the graph with a different color (red)
-    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/Network reliability optimization/data/newEdges.csv"
+    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/newEdges.csv"
     file = open(file, "r")
     for line in file:
         line = line.split(", ")
@@ -64,7 +64,7 @@ def main():
             node_color='lightgreen')
 
     #save the graph as an image in the same folder as the data
-    plt.savefig("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/Network reliability optimization/data/GraphWithNewEdges.png")
+    plt.savefig("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/GraphWithNewEdges.png")
     plt.show()
 
 if __name__ == "__main__":

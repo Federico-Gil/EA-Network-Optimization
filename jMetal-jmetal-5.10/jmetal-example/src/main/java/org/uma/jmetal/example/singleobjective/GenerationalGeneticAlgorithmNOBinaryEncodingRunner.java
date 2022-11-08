@@ -36,8 +36,8 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 	private static final float COST_PER_KILOMETER = 45000;
 	private static final int PRESUPUESTO = 500000;
 
-	private static final int MAX_EVALUATIONS = 15000;
-	private static final int POPULATION_SIZE = 20;
+	private static final int MAX_EVALUATIONS = 10000;
+	private static final int POPULATION_SIZE = 50;
 	private static final float CROSSOVER_PROBABILITY = 0.9f;
 	private static final float MUTATION_MULTIPLIER = 1.0f;
 
@@ -58,7 +58,7 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
     problem = new NOBinaryNuevoFitness(CANTIDAD_DE_NODOS,edges) ; // esto es lo que se cambia para probar el nuevo fitness
 
     //crossover = new HUXCrossover(0.95) ;
-	crossover = new HUXCrossover(CROSSOVER_PROBABILITY) ;
+	crossover = new HUXCrossover(CROSSOVER_PROBABILITY);
 
     double mutationProbability = 1.0*MUTATION_MULTIPLIER / problem.getBitsFromVariable(0);
     mutation = new BitFlipMutation(mutationProbability) ;
@@ -78,16 +78,6 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
     List<BinarySolution> population = new ArrayList<>(1) ;
     population.add(solution) ;
 
-	//initialize the greedy population
-	/*
-	List<BinarySet> popu = grafo.greedyPopulation(POPULATION_SIZE-1, PRESUPUESTO);
-	for (BinarySet bitSet : popu) {
-		BinarySolution sol = problem.createSolution();
-		sol.setVariable(0, bitSet);
-		System.out.println("Greedy: " + sol.getVariable(0));
-		population.add(sol);
-	}*/
-
     long computingTime = algorithmRunner.getComputingTime() ;
 
     new SolutionListOutput(population)
@@ -102,10 +92,10 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
     JMetalLogger.logger.info("Fitness: " + solution.getObjective(0)) ;
     JMetalLogger.logger.info("Solution: " + solution.getVariable(0)) ;
     
-    validate(solution);
+    validate(solution, (NOBinaryNuevoFitness) problem);
   }  
   
-  private static void validate(BinarySolution solution) {
+  private static void validate(BinarySolution solution, NOBinaryNuevoFitness problem) {
 	  Grafo grafo; 
 	  Set<Edge> asd = readEdges("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv");
 	  grafo = new Grafo(24,asd);
@@ -148,7 +138,7 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 				gt.addEdge(e);
 			}
 		}
-	//}
+		
 	  
 	  long costoOriginal = 0L;
 	  long costoNuevo = 0L;
@@ -187,6 +177,25 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 		} catch (IOException err1) {
 			err1.printStackTrace();
 		}
+
+		//print the map bestFitnessPerGeneration
+		System.out.println("Best fitness per generation:");
+		for (int i = 0; i < problem.getBestFitnessPerGeneration().size(); i++) {
+			System.out.println("Generation " + i + ": " + problem.getBestFitnessPerGeneration().get(i));				
+		}
+
+		//save the map bestFitnessPerGeneration to a csv file
+		try {
+			FileWriter writer = new FileWriter("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/bestFitnessPerGeneration.csv");
+			for (int i = 0; i < problem.getBestFitnessPerGeneration().size(); i++) {
+				writer.append(i + "," + problem.getBestFitnessPerGeneration().get(i));
+				writer.append("\n");
+			}
+			writer.flush();
+			writer.close();
+			} catch (IOException err1) {
+				err1.printStackTrace();
+			}
   	}
 
   /*  

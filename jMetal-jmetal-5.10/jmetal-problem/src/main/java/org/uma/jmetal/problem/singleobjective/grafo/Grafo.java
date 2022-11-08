@@ -18,7 +18,7 @@ public class Grafo {
 		this.visited = new boolean[nVertices+1];
 		
 		//create the adjacency list
-		for (int i = 1; i <= nVertices; i++) {
+		for (int i = 1; i <= nVertices+1; i++) {
             adjacencyList.put(i, new HashSet<>());
         }
 
@@ -27,6 +27,12 @@ public class Grafo {
 		}
 
 		for (int i = 1; i <= nVertices; i++) addVertex(i);
+
+		//add the edges to the adjacency list
+		for (Edge edge : edges) {
+			adjacencyList.get(edge.getV1()).add(edge.getV2());
+			adjacencyList.get(edge.getV2()).add(edge.getV1());
+		}
 	}
 
 	//get and set methods

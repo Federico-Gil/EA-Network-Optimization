@@ -2,6 +2,8 @@ package org.uma.jmetal.problem.singleobjective.montecarlo;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
 
 import org.uma.jmetal.problem.singleobjective.grafo.Edge;
 import org.uma.jmetal.problem.singleobjective.grafo.Grafo;
@@ -15,11 +17,19 @@ public class aproximateR24 {
 		int nVertices = 24;
 		
 		//parse the edges array into a set of edges
-		java.util.Set<Edge> edgesSet = readEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\Network reliability optimization\\data\\24-nodes.csv");
+		java.util.Set<Edge> edgesSet = readEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\24-nodes.csv");
 		
 		Instant start = Instant.now();
 		//create the graph
 		Grafo graph = new Grafo(nVertices, edgesSet);
+		graph = graph.updateSample();
+		Map<Integer, Set<Integer>> adjList = graph.getAdjacencyList();
+
+		//print the adjacency list
+		for (int i = 1; i < adjList.size(); i++) {
+			System.out.println("Node " + i + " is connected to: " + adjList.get(i));
+		}
+		
 		double[] results = null;
 		for (int i = 0; i < 10; i++) {
 			results = graph.monteCarlo((int) 1e3, (float) 0.05);					
