@@ -30,14 +30,17 @@ class Graph_pq {
    
         // Distance to the source from itself is 0 
         dist[src_vertex] = 0f; 
-        while (visited.size() != V) { 
- 
-   // u is removed from PriorityQueue and has min distance  
+    
+        while (visited.size() != V ) { 
+        // u is removed from PriorityQueue and has min distance  
             int u = pqueue.remove().node; 
    
             // add node to finalized list (visited)
             visited.add(u); 
             graph_adjacentNodes(u); 
+
+            System.out.println(visited.size()); 
+
         } 
     } 
   // this methods processes all neighbours of the just visited node 
@@ -69,16 +72,19 @@ class Main{
         int V = 25; 
         int source = 1; 
         //read the edges from the .csv file
-        Set<Edge> edges = readEdges("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv");
+        Set<Edge> edges = readEdges("/Users/pau/Fing/EA-Network-Optimization-master/data/24-nodesWc.csv");
         //create a graph
         Grafo graph = new Grafo(V, edges);
-   
+
+        System.out.println(graph.getAdjacencyList().get(2));
+
+        
         
 
         // adjacency list representation of graph
         List<List<Node> > adj_list = new ArrayList<List<Node> >(); 
         // Initialize adjacency list for every node in the graph 
-        for (int i = 1; i < V; i++) { 
+        for (int i = 1; i <= V; i++) { 
             List<Node> item = new ArrayList<Node>(); 
             adj_list.add(item); 
         } 
@@ -87,11 +93,12 @@ class Main{
         Set<Edge> edgeSet = graph.getEdges();
 
         //add edges to the graph
-        for (Edge edge : edgeSet) {
+        for (Edge edge : edgeSet ) {
             adj_list.get(edge.getV1()).add(new Node(edge.getV2(), edge.getCost()));
             adj_list.get(edge.getV2()).add(new Node(edge.getV1(), edge.getCost()));
         }
-
+        
+        
         //print the graph
         for (int i = 1; i < adj_list.size(); i++) { 
             List<Node> edgeList = adj_list.get(i); 
@@ -101,6 +108,9 @@ class Main{
                                    + edgeList.get(j).cost); 
             } 
         }
+
+        
+
    
         // call Dijkstra's algo method  
         Graph_pq dpq = new Graph_pq(V); 
