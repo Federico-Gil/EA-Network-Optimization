@@ -36,7 +36,7 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 	private static final float COST_PER_KILOMETER = 45000;
 	private static final int PRESUPUESTO = 500000;
 
-	private static final int MAX_EVALUATIONS = 15000;
+	private static final int MAX_EVALUATIONS = 10000;
 	private static final int POPULATION_SIZE = 50;
 	private static final float CROSSOVER_PROBABILITY = 0.9f;
 	private static final float MUTATION_MULTIPLIER = 1.0f;
@@ -183,6 +183,19 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 		for (int i = 0; i < problem.getBestFitnessPerGeneration().size(); i++) {
 			System.out.println("Generation " + i + ": " + problem.getBestFitnessPerGeneration().get(i));				
 		}
+
+		//save the map bestFitnessPerGeneration to a csv file
+		try {
+			FileWriter writer = new FileWriter("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/bestFitnessPerGeneration.csv");
+			for (int i = 0; i < problem.getBestFitnessPerGeneration().size(); i++) {
+				writer.append(i + "," + problem.getBestFitnessPerGeneration().get(i));
+				writer.append("\n");
+			}
+			writer.flush();
+			writer.close();
+			} catch (IOException err1) {
+				err1.printStackTrace();
+			}
   	}
 
   /*  

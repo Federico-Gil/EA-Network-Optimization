@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,11 +30,14 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	private int currentEvaluation;
 	private List<List<Integer>> posibleEdges;
 	private static final float COST_PER_KILOMETER = 45000;
-	private static final float ALPHA = 0.3f/12420000.0f;
-	private static final float BETA = 0.7f;
+	private static final float ALPHA = 0.2f/12420000.0f;
+	private static final float BETA = 0.8f;
 
 	private static final Integer POPULATION_SIZE = 50;
 	private static final Integer MAX_EVALUATIONS = 15000;
+
+	//set of BinarySolutions to store the created individuals
+	private List<BinarySolution> greedyIndividuals = new ArrayList<BinarySolution>();
 
 
 	//keep track of the fitness of the best solution in each generation
@@ -103,9 +105,15 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
   @Override
   public BinarySolution createSolution() {
 	//with a 50% chance, the solution will be greedy or random
-	if (Math.random() < 0.1) {
-		System.out.println("greedy solution"); 
-		return greedy(PRESUPUESTO);
+	if (Math.random() < 0.5f) {
+		//while the solution is contained in the set of greedy solutions, generate a new one. Compare the solutions using the comparteSolutions method
+		BinarySolution solution;
+		do {
+			solution = greedy(PRESUPUESTO);
+		} while (greedyIndividuals.contains(solution));
+		greedyIndividuals.add(solution);
+		System.out.println(solution.getVariable(0));
+		return solution;
 	} else {
 		System.out.println("random solution");
 		return new DefaultBinarySolution(getListOfBitsPerVariable(), getNumberOfObjectives()) ;
@@ -144,8 +152,10 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 
 	//calculate the degree of each vertex in the sampled graph
 	for (Edge e : g.getEdges()) {
-		degree.put(e.getV1(), degree.get(e.getV1())+1);
-		degree.put(e.getV2(), degree.get(e.getV2())+1);
+		if (e.getExists()){
+			degree.put(e.getV1(), degree.get(e.getV1())+1);
+			degree.put(e.getV2(), degree.get(e.getV2())+1);
+		}
 	}
 
 	//while in budget add an edge between the two (diferent) vertices with the lowers degree
@@ -200,6 +210,16 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	}
 	return individual;
 }
+
+	//boolean function to compare to binary solutions and override the equals method
+	public Boolean compareSolutions(BinarySolution s1, BinarySolution s2) {
+			for (int j = 0; j < s1.getVariable(0).getBinarySetLength() ; j++) {
+				if (s1.getVariable(0).get(j) != s2.getVariable(0).get(j)) {
+					return false;
+				}
+			}
+		return true;
+	}
 
 
 
@@ -261,14 +281,16 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 
 	  if (currentEvaluation % POPULATION_SIZE == 0) {
 		  //calculate the average fitness of the population
-		  /*
+/*
 		  double averageFitness = 0;
 		  for (int i = 0; i < POPULATION_SIZE; i++) {
 			  averageFitness += currentFitness[i];
 		  }
 		  averageFitness /= POPULATION_SIZE;
-		  */
+*/
+
 		  //calculate the best fitness of the population
+		  
 		  double bestFitness = Double.MAX_VALUE;
 		  for (int i = 0; i < POPULATION_SIZE; i++) {
 			  if (currentFitness[i] < bestFitness) {
@@ -276,10 +298,9 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 			  }
 		  }
 
-
 		  //print the average fitness of the population
-		  System.out.println("Average fitness: " + bestFitness);
-
+		  //System.out.println("Average fitness: " + averageFitness);
+		  System.out.println(bestFitness + ",");
 		  //add the value to the map
 		  bestFitnessPerGeneration.put(currentEvaluation/POPULATION_SIZE, bestFitness);
 	  }
@@ -326,5 +347,4 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 		return edges;
 	}
 }
-
 
