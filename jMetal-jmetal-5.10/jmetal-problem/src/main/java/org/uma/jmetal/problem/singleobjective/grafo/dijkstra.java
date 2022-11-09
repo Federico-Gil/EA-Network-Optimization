@@ -72,13 +72,9 @@ class Main{
         int V = 25; 
         int source = 1; 
         //read the edges from the .csv file
-        Set<Edge> edges = readEdges("/Users/pau/Fing/EA-Network-Optimization-master/data/24-nodesWc.csv");
+        Set<Edge> edges = readEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\24-nodesWc.csv");
         //create a graph
         Grafo graph = new Grafo(V, edges);
-
-        System.out.println(graph.getAdjacencyList().get(2));
-
-        
         
 
         // adjacency list representation of graph

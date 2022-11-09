@@ -9,7 +9,7 @@ from networkx.algorithms.bipartite import color
 
 def main():
     #read the file
-    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv"
+    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/118-nodesWc.csv"
     file = open(file, "r")
     #create a graph
     G = nx.Graph()
