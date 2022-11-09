@@ -80,10 +80,53 @@ class Graph_pq {
 }
 class Main{    
     public static void main(String arg[])   { 
+        //for each vertex, we create a list of adjacent vertices
+        //return a list of maps
+        List<Map<Integer, Double>> list = new ArrayList<Map<Integer, Double>>();
+        //for each vertex call dijkstra algorithm
+        for (int i = 0; i < 25 ;i++) {
+            //put the map result of dijkstra algorithm in the list
+            list.add(Dijkstra(i));
+        }
+
+        //
+        Grafo grafo; 
+        Set<Edge> asd = readEdges("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv");
+        grafo = new Grafo(24,asd);
+        
+        //aristas del grafo original
+        Set<Edge> e1 =  grafo.getEdges();
+        
+        ArrayList<List<Integer>> posibleEdges;
+        int numberOfNodes = grafo.getnVertices();
+        posibleEdges = new ArrayList<List<Integer>>();
+        for (int i = 1; i <= numberOfNodes; i++) {
+            for (int j = i+1; j <= numberOfNodes; j++) {
+                List<Integer> edge = new ArrayList<Integer>();
+                edge.add(i);
+                edge.add(j);
+                // if the edge is not in the original graph, add it to the list of posible edges, without using contains
+                if (!e1.contains(new Edge(i,j,0f,0f,true))) {
+                    posibleEdges.add(edge);
+                }
+            }
+        }
+
+
+        //for each posible edge, we calculate the cost of the edge and write it to a csv file
+
+        for (int i = 0; i < posibleEdges.size(); i++) {
+            int node1 = posibleEdges.get(i).get(0);
+            int node2 = posibleEdges.get(i).get(1);
+            double cost = list.get(node1).get(node2);
+            System.out.println(node1 + ", " + node2 + ", " + cost + ", ");
+        }
+    } 
+
+    public static Map<Integer, Double> Dijkstra(int source){
         int V = 25; 
-        int source = 1; 
         //read the edges from the .csv file
-        Set<Edge> edges = readEdges("/Users/pau/Fing/EA-Network-Optimization-master/data/24-nodesWc.csv");
+        Set<Edge> edges = readEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\24-nodesWc.csv");
         //create a graph
         Grafo graph = new Grafo(V, edges);
 
@@ -124,8 +167,15 @@ class Main{
         System.out.println("The shorted path from source node to other nodes:"); 
         System.out.println("Source\t\t" + "Node#\t\t" + "Distance");
         for (int i = 1; i < dpq.dist.length; i++) 
-            System.out.println(source + " \t\t " + i + " \t\t "  + dpq.dist[i]); 
-    } 
+            System.out.println(source + " \t\t " + i + " \t\t "  + dpq.dist[i]);
+
+        //create a map with the distances
+        Map<Integer, Double> distances = new HashMap<Integer, Double>();
+        for (int i = 1; i < dpq.dist.length; i++) {
+            distances.put(i, dpq.dist[i]);
+        }
+        return distances;
+    }
 
     public static java.util.Set<Edge> readEdges(String fileName) {
 		//create a set of edges

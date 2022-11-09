@@ -64,7 +64,7 @@ def main():
             node_color='lightgreen')
 
     #save the graph as an image in the same folder as the data
-    plt.savefig("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/GraphWithNewEdges.png")
+    plt.savefig("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/GraphWithNewEdges.png")
     plt.show()
 
 if __name__ == "__main__":
