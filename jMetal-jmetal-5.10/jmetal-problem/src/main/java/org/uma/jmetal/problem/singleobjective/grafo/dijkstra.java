@@ -119,7 +119,7 @@ class Main{
             int node1 = posibleEdges.get(i).get(0);
             int node2 = posibleEdges.get(i).get(1);
             double cost = list.get(node1).get(node2);
-            System.out.println(node1 + ", " + node2 + ", " + cost + ", ");
+            System.out.println(node1 + ", " + node2 + ", " + (cost*0.7) + ", ");
         }
     } 
 
