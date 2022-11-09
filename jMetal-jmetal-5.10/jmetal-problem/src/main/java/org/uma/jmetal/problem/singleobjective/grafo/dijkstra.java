@@ -87,7 +87,6 @@ class Main{
         //create a graph
         Grafo graph = new Grafo(V, edges);
 
-
         // adjacency list representation of graph
         List<List<Node> > adj_list = new ArrayList<List<Node> >(); 
     

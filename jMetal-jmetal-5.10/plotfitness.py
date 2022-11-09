@@ -18,7 +18,7 @@ data = np.array(data)
 data = data.astype(np.float)
 
 #plot the data
-plt.plot(data[:,0], data[:,1], 'o')
+plt.plot(data[1:,0], data[1:,1], 'o')
 plt.xlabel('Generation')
 plt.ylabel('Fitness')
 plt.show()

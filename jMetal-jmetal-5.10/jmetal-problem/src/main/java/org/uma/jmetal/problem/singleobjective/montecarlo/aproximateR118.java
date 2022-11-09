@@ -13,7 +13,7 @@ public class aproximateR118 {
 		
 		int nVertices = 118;
 		
-		Set<Edge> edgesSet = readEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\Network reliability optimization\\data\\118-nodes.csv");
+		Set<Edge> edgesSet = readEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\118-nodes.csv");
 		
 		//create the graph
 		Grafo graph = new Grafo(nVertices, edgesSet);
@@ -21,7 +21,7 @@ public class aproximateR118 {
 		/////////////
 
 		/* eps = 0.001, delta = 0.01 n= 2649158 */
-		double[] results = graph.monteCarlo((int) 1e3, (float) 0.01);
+		double[] results = graph.monteCarlo((int) 1e5, (float) 0.01);
 
 		Instant end = Instant.now();
 		/////////////

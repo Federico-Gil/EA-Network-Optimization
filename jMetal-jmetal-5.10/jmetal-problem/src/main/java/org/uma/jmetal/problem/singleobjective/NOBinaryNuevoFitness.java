@@ -25,23 +25,22 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	private int numberOfNodes;
 	private Set<Edge> aristasOriginales;
 	private int bits ;
-	private static final Integer PRESUPUESTO = 500000;
+	private static final Integer PRESUPUESTO = 1000000;
 	private int cantidadAristasOriginales;
 	private int currentEvaluation;
 	private List<List<Integer>> posibleEdges;
 	private static final float COST_PER_KILOMETER = 45000;
-	private static final float ALPHA = 0.2f/12420000.0f;
-	private static final float BETA = 0.8f;
+	private static final float ALPHA = 0.25f/305010000.0f; //12420000.0f
+	private static final float BETA = 0.75f;
 
-	private static final Integer POPULATION_SIZE = 50;
-	private static final Integer MAX_EVALUATIONS = 15000;
+	private static final Integer POPULATION_SIZE = 100;
 
 	//set of BinarySolutions to store the created individuals
 	private List<BinarySolution> greedyIndividuals = new ArrayList<BinarySolution>();
 
 
 	//keep track of the fitness of the best solution in each generation
-	private Map<Integer,Double> bestFitnessPerGeneration;
+	private Double bestfitness;
 	//keep an array of the fitness of all the solutions in the current generation
 	private double[] currentFitness;
 
@@ -51,7 +50,7 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	this.numberOfNodes = numberOfNodes;
 	
 	//keep track of the fitness of the best solution in each generation
-	bestFitnessPerGeneration = new HashMap<Integer,Double>();
+	bestfitness = Double.MAX_VALUE;
 
 	//keep an array of the fitness of all the solutions in the current generation
 	currentFitness = new double[POPULATION_SIZE];
@@ -84,7 +83,6 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 
   }
 
-
   public int getCurrentEvaluation() {
 	  return currentEvaluation;
   }
@@ -105,7 +103,7 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
   @Override
   public BinarySolution createSolution() {
 	//with a 50% chance, the solution will be greedy or random
-	if (Math.random() < 0.5f) {
+	if (Math.random() < 0.3) {
 		//while the solution is contained in the set of greedy solutions, generate a new one. Compare the solutions using the comparteSolutions method
 		BinarySolution solution;
 		do {
@@ -221,8 +219,6 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 		return true;
 	}
 
-
-
   /** Evaluate() method */
 	//funcion de fitness
   @Override
@@ -278,41 +274,16 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	 // if (currentEvaluation % 100 == 0) {
 	//	  System.out.println("Current fitness: " + fitness + " Progress: " +((currentEvaluation/15000f)*100) + " %" + " Costo Update: " + costoUpdate);
 	  //}
-
-	  if (currentEvaluation % POPULATION_SIZE == 0) {
-		  //calculate the average fitness of the population
-/*
-		  double averageFitness = 0;
-		  for (int i = 0; i < POPULATION_SIZE; i++) {
-			  averageFitness += currentFitness[i];
-		  }
-		  averageFitness /= POPULATION_SIZE;
-*/
-
-		  //calculate the best fitness of the population
-		  
-		  double bestFitness = Double.MAX_VALUE;
-		  for (int i = 0; i < POPULATION_SIZE; i++) {
-			  if (currentFitness[i] < bestFitness) {
-				  bestFitness = currentFitness[i];
-			  }
-		  }
-
-		  //print the average fitness of the population
-		  //System.out.println("Average fitness: " + averageFitness);
-		  System.out.println(bestFitness + ",");
-		  //add the value to the map
-		  bestFitnessPerGeneration.put(currentEvaluation/POPULATION_SIZE, bestFitness);
-	  }
+			  
+		if (fitness < bestfitness) {
+			bestfitness = fitness;
+			Integer generationN = currentEvaluation/POPULATION_SIZE;
+			System.out.println(generationN + ", " + bestfitness );
+		}
 
 
 	  solution.setObjective(0, fitness);
-  }
-
-  //a getter for the map bestFitnessPerGeneration
-  public Map<Integer, Double> getBestFitnessPerGeneration() {
-	  return bestFitnessPerGeneration;
-  }
+	}
   
   public int[] proy(int i) {
 	  int x,y;
@@ -347,4 +318,3 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 		return edges;
 	}
 }
-
