@@ -15,7 +15,7 @@ class Graph_pq {
         dist = new double[V]; 
         visited = new HashSet<Integer>(); 
         pqueue = new PriorityQueue<Node>(V, new Node()); 
-    } 
+    }
    
     // Dijkstra's Algorithm implementation 
     public void algo_dijkstra(List<List<Node> > adj_list, int src_vertex) 
@@ -32,14 +32,25 @@ class Graph_pq {
         dist[src_vertex] = 0f; 
     
         while (visited.size() != V ) { 
-        // u is removed from PriorityQueue and has min distance  
-            int u = pqueue.remove().node; 
+
+            if (pqueue.isEmpty())
+                return;
+
+            // u is removed from PriorityQueue and has min distance  
+            int u = pqueue.remove().node;
+
+            // Adding the node whose distance is
+                // finalized
+                if (visited.contains(u))
+     
+                    // Continue keyword skips execution for
+                    // following check
+                    continue;
    
             // add node to finalized list (visited)
             visited.add(u); 
             graph_adjacentNodes(u); 
 
-            System.out.println(visited.size()); 
 
         } 
     } 
@@ -49,7 +60,7 @@ class Graph_pq {
         double newDistance = -1; 
    
         // process all neighbouring nodes of u 
-        for (int i = 1; i < adj_list.get(u).size(); i++) { 
+        for (int i = 0; i < adj_list.get(u).size(); i++) { 
             Node v = adj_list.get(u).get(i); 
    
             //  proceed only if current node is not in 'visited'
@@ -65,7 +76,7 @@ class Graph_pq {
                 pqueue.add(new Node(v.node, dist[v.node])); 
             } 
         } 
-    } 
+    }
 }
 class Main{    
     public static void main(String arg[])   { 
@@ -76,15 +87,12 @@ class Main{
         //create a graph
         Grafo graph = new Grafo(V, edges);
 
-        System.out.println(graph.getAdjacencyList().get(2));
-
-        
-        
 
         // adjacency list representation of graph
         List<List<Node> > adj_list = new ArrayList<List<Node> >(); 
+    
         // Initialize adjacency list for every node in the graph 
-        for (int i = 1; i <= V; i++) { 
+        for (int i = 0; i < V; i++) { 
             List<Node> item = new ArrayList<Node>(); 
             adj_list.add(item); 
         } 
@@ -97,20 +105,17 @@ class Main{
             adj_list.get(edge.getV1()).add(new Node(edge.getV2(), edge.getCost()));
             adj_list.get(edge.getV2()).add(new Node(edge.getV1(), edge.getCost()));
         }
+   
         
-        
-        //print the graph
-        for (int i = 1; i < adj_list.size(); i++) { 
-            List<Node> edgeList = adj_list.get(i); 
-            for (int j = 1; j < edgeList.size(); j++) { 
-                System.out.println("node " + i + " is connected to " 
-                                   + edgeList.get(j).node + " with cost " 
-                                   + edgeList.get(j).cost); 
-            } 
-        }
-
-        
-
+        // //print the graph
+        // for (int i = 1; i < adj_list.size(); i++) { 
+        //     List<Node> edgeList = adj_list.get(i); 
+        //     for (int j = 1; j < edgeList.size(); j++) { 
+        //         System.out.println("node " + i + " is connected to " 
+        //                            + edgeList.get(j).node + " with cost " 
+        //                            + edgeList.get(j).cost); 
+        //     } 
+        // }
    
         // call Dijkstra's algo method  
         Graph_pq dpq = new Graph_pq(V); 
@@ -122,7 +127,6 @@ class Main{
         for (int i = 1; i < dpq.dist.length; i++) 
             System.out.println(source + " \t\t " + i + " \t\t "  + dpq.dist[i]); 
     } 
-
 
     public static java.util.Set<Edge> readEdges(String fileName) {
 		//create a set of edges
