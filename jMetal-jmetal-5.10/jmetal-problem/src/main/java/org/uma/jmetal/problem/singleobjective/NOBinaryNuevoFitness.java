@@ -24,36 +24,33 @@ import java.util.Set;
 public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	private int numberOfNodes;
 	private Set<Edge> aristasOriginales;
+	private List<Edge> aristasPosibles;
 	private int bits ;
 	private static final Integer PRESUPUESTO = 1000000;
 	private int cantidadAristasOriginales;
 	private int currentEvaluation;
-	private List<List<Integer>> posibleEdges;
 	private static final float COST_PER_KILOMETER = 45000;
-	private static final float ALPHA = 0.25f/305010000.0f; //12420000.0f
+	private static final float ALPHA = 0.25f; //12420000.0f
 	private static final float BETA = 0.75f;
+	private double cMax;
 
 	private static final Integer POPULATION_SIZE = 100;
 
 	//set of BinarySolutions to store the created individuals
 	private List<BinarySolution> greedyIndividuals = new ArrayList<BinarySolution>();
+	private List<BinarySolution> bestIndividuals = new ArrayList<BinarySolution>();
 
 
 	//keep track of the fitness of the best solution in each generation
 	private Double bestfitness;
-	//keep an array of the fitness of all the solutions in the current generation
-	private double[] currentFitness;
 
   /** Constructor */
-  public NOBinaryNuevoFitness(Integer numberOfNodes, Set<Edge> oEdges) {
+  public NOBinaryNuevoFitness(Integer numberOfNodes, Set<Edge> oEdges, List<Edge> possibleEdges) {
 	currentEvaluation = 0;
 	this.numberOfNodes = numberOfNodes;
 	
 	//keep track of the fitness of the best solution in each generation
 	bestfitness = Double.MAX_VALUE;
-
-	//keep an array of the fitness of all the solutions in the current generation
-	currentFitness = new double[POPULATION_SIZE];
 
 	//store a copy of the original edges and not the reference
 	aristasOriginales = oEdges;
@@ -66,21 +63,14 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 
     bits =  numberOfNodes*(numberOfNodes-1)/2 - cantidadAristasOriginales;
 
-	/* the posible edges are the edges that can be added to the original graph,
-	 * meaning that they are not already in the original graph */
-	posibleEdges = new ArrayList<List<Integer>>();
-	for (int i = 1; i <= numberOfNodes; i++) {
-		for (int j = i+1; j <= numberOfNodes; j++) {
-			List<Integer> edge = new ArrayList<Integer>();
-			edge.add(i);
-			edge.add(j);
-			// if the edge is not in the original graph, add it to the list of posible edges, without using contains
-			if (!aristasOriginales.contains(new Edge(i,j,0f,0f,true))) {
-				posibleEdges.add(edge);
-			}
-		}
-	}
+	aristasPosibles = possibleEdges;
 
+	//calculate de maximum cost, it is, the sum of the cost of all the possible edges multiplied by COST_PER_KILOMETER
+	cMax = 0;
+	for (Edge edge : aristasPosibles) {
+		cMax += edge.getCost();
+	}
+	cMax *= COST_PER_KILOMETER;
   }
 
   public int getCurrentEvaluation() {
@@ -122,22 +112,9 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	//posible edges
 	Set<Edge> edges = aristasOriginales;
 	Integer nVertices = numberOfNodes;
-	List<List<Integer>> posibleEdges;
-	posibleEdges = new ArrayList<List<Integer>>();
-	for (int i = 1; i <= nVertices; i++) {
-		for (int j = i+1; j <= nVertices; j++) {
-			List<Integer> edge = new ArrayList<Integer>();
-			edge.add(i);
-			edge.add(j);
-			// if the edge is not in the original graph, add it to the list of posible edges, without using contains
-			if (!edges.contains(new Edge(i,j,0f,0f,true))) {
-				posibleEdges.add(edge);
-			}
-		}
-	}
 
 	//create the original graph
-	Grafo g = new Grafo(nVertices, edges);
+	Grafo g = new Grafo(nVertices, edges,aristasPosibles);
 
 	//update a sample of the graph
 	g = g.updateSample();
@@ -175,15 +152,27 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 			}
 		}
 
-		//add the edge to the graph
-		g.addEdge(new Edge(v1,v2,0.05f,1.0f,true));
+		//find the edge between the two vertices in the possible edges
+		Edge e = null;
+		for (Edge edge : aristasPosibles) {
+			if ((edge.getV1() == v1 && edge.getV2() == v2) || (edge.getV1() == v2 && edge.getV2() == v1)) {
+				e = edge;
+				break;
+			}
+		}
 
-		//update the degree of the vertices
-		degree.put(v1, degree.get(v1)+1);
-		degree.put(v2, degree.get(v2)+1);
+		if (e != null) {
+			//add the edge to the graph
+			g.addEdge(new Edge(e.getV1(), e.getV2(), e.getWeight(), e.getCost(), true));
 
-		//update the budget
-		budget -= COST_PER_KILOMETER;
+			//update the degree of the vertices
+			degree.put(v1, degree.get(v1)+1);
+			degree.put(v2, degree.get(v2)+1);
+
+			//update the budget
+			budget -= e.getCost()*COST_PER_KILOMETER;
+		}
+		budget--; //to avoid infinite loops		
 	}
 
 	//create the solution
@@ -200,50 +189,32 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 
 	//for each new edge, set the corresponding bit to 1 in the solution where the bits are ordered by the posible edges
 	int i = 0;
-	for (List<Integer> edge : posibleEdges) {
-		if (edgesResult.contains(new Edge(edge.get(0),edge.get(1),0f,0f,true)) || edgesResult.contains(new Edge(edge.get(1),edge.get(0),0f,0f,true))) {
-			individual.getVariable(0).set(i, true);
+	for (Edge edge : aristasPosibles) {
+		if (edgesResult.contains(edge)) {
+			individual.getVariable(0).set(i);
 		}
 		i++;
 	}
 	return individual;
 }
 
-	//boolean function to compare to binary solutions and override the equals method
-	public Boolean compareSolutions(BinarySolution s1, BinarySolution s2) {
-			for (int j = 0; j < s1.getVariable(0).getBinarySetLength() ; j++) {
-				if (s1.getVariable(0).get(j) != s2.getVariable(0).get(j)) {
-					return false;
-				}
-			}
-		return true;
-	}
-
   /** Evaluate() method */
 	//funcion de fitness
   @Override
   public void evaluate(BinarySolution solution) {  
 	  currentEvaluation++;
-	  Grafo gt = new Grafo(numberOfNodes,aristasOriginales);
+	  Grafo gt = new Grafo(numberOfNodes,aristasOriginales,aristasPosibles);
 	  Set<Edge> nuevasAristas = new java.util.HashSet<>();
 	  BitSet bitset = solution.getVariable(0) ;
 	  
 	  //for each bit in the bitset, if it is 1, add the corresponding edge to the graph else add the edge with exists = false
 		for (int i = 0; i < bitset.length(); i++) {
-			if (bitset.get(i)) {/*
-				int x = posibleEdges.get(i).get(0);
-				int y = posibleEdges.get(i).get(1);
-
-				if (!aristasOriginales.contains(new Edge(x,y,0f,0f,true))) {
-					float d = (float) gt.distance(x, y);
-					System.out.println("distance: " + d);
-					Edge e = new Edge(x,y,d*0.05, d*0.7,true);*/ 
-					Edge e = new Edge(posibleEdges.get(i).get(0),posibleEdges.get(i).get(1),0.05f,1.0f,true);
+			if (bitset.get(i)) {
+					Edge e = new Edge(aristasPosibles.get(i).getV1(),aristasPosibles.get(i).getV2(),aristasPosibles.get(i).getCost()*0.05f,aristasPosibles.get(i).getCost(),true);
 					nuevasAristas.add(e);
 					gt.addEdge(e);
 				}
 			}
-		//}
 	  
 	  long costoUpdate = 0L;
 
@@ -259,26 +230,19 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	  } */
 	  
 	  double R = gt.monteCarlo((int) 1e3, 0.05f)[0];
-	  double fitness = ALPHA*costoUpdate + BETA*(1.0f/R);
+	  double fitness = ALPHA*costoUpdate/cMax + BETA*(1.0f/R);
 
 	  //if the budget is exceeded, the fitness is set to 
 	  if (costoUpdate > PRESUPUESTO) {
 		  fitness *= 1e6;
 	}
-
-	//store the fitness to currentFitness in the position of the current evaluation modulo the population size
-	currentFitness[currentEvaluation % POPULATION_SIZE] = fitness;
-
-
-	  //print the current fitness every 100 evaluations, asuming there are 25000 evaluations print the progress porcentage as well
-	 // if (currentEvaluation % 100 == 0) {
-	//	  System.out.println("Current fitness: " + fitness + " Progress: " +((currentEvaluation/15000f)*100) + " %" + " Costo Update: " + costoUpdate);
-	  //}
 			  
 		if (fitness < bestfitness) {
 			bestfitness = fitness;
 			Integer generationN = currentEvaluation/POPULATION_SIZE;
 			System.out.println(generationN + ", " + bestfitness );
+			//add the best solution to the array
+			bestIndividuals.add(solution);
 		}
 
 
@@ -316,5 +280,51 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 
 		//return the set of edges
 		return edges;
+	}
+
+	 //method that reads the possible edges from a csv file
+	 public static java.util.List<Edge> readPossibleEdges(String fileName) {
+        //create a list of edges
+        java.util.List<Edge> edges = new java.util.ArrayList<>();
+
+        //read the file
+        try {
+            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(fileName));
+            String line = reader.readLine();
+            while (line != null) {
+                //split the line into the vertices and the probability
+                String[] lineSplit = line.split(", ");
+                //add the edge to the set
+                edges.add(new Edge(Integer.parseInt(lineSplit[0]), Integer.parseInt(lineSplit[1]), Float.parseFloat(lineSplit[2])*0.05f, Float.parseFloat(lineSplit[2]) ,false));
+                //read the next line
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        //return the set of edges
+        return edges;
+    }
+
+	//save the best individuals to a file interpreting the edges
+	public void saveBestIndividuals(String fileName, java.util.List<Edge> aristasPosibles) {
+		try {
+			java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(fileName));
+			for (BinarySolution individual : bestIndividuals) {
+				BitSet bitset = individual.getVariable(0);
+				for (int i = 0; i < bitset.length(); i++) {
+					if (bitset.get(i)) {
+						writer.write(aristasPosibles.get(i).getV1() + ", " + aristasPosibles.get(i).getV2() + ", " + aristasPosibles.get(i).getWeight() + ", " + aristasPosibles.get(i).getCost());
+						writer.newLine();
+					}
+				}
+				writer.newLine();
+			}
+			writer.close();
+		} catch (java.io.IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

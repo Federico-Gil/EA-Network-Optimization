@@ -9,7 +9,7 @@ from networkx.algorithms.bipartite import color
 
 def main():
     #read the file
-    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/118-nodesWc.csv"
+    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv"
     file = open(file, "r")
     #create a graph
     G = nx.Graph()
@@ -40,7 +40,7 @@ def main():
     #plt.savefig("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/Network reliability optimization/data/OriginalGraph.png")
 
     #now read other file and add the edges to the graph with a different color (red)
-    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/newEdges.csv"
+    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/bestIndividuals.csv"
     file = open(file, "r")
     for line in file:
         line = line.split(", ")

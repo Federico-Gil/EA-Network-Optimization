@@ -92,7 +92,8 @@ class Main{
         //
         Grafo grafo; 
         Set<Edge> asd = readEdges("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv");
-        grafo = new Grafo(24,asd);
+        List<Edge> possibleEdges = readPossibleEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\costosPosibles.csv");
+        grafo = new Grafo(24,asd,possibleEdges);
         
         //aristas del grafo original
         Set<Edge> e1 =  grafo.getEdges();
@@ -127,8 +128,9 @@ class Main{
         int V = 25; 
         //read the edges from the .csv file
         Set<Edge> edges = readEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\24-nodesWc.csv");
+        List<Edge> possibleEdges = readPossibleEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\costosPosibles.csv");
         //create a graph
-        Grafo graph = new Grafo(V, edges);
+        Grafo graph = new Grafo(V, edges,possibleEdges);
 
         // adjacency list representation of graph
         List<List<Node> > adj_list = new ArrayList<List<Node> >(); 
@@ -201,6 +203,32 @@ class Main{
 		//return the set of edges
 		return edges;
 	}
+
+    //method that reads the possible edges from a csv file
+    public static java.util.List<Edge> readPossibleEdges(String fileName) {
+        //create a list of edges
+        java.util.List<Edge> edges = new java.util.ArrayList<>();
+
+        //read the file
+        try {
+            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(fileName));
+            String line = reader.readLine();
+            while (line != null) {
+                //split the line into the vertices and the probability
+                String[] lineSplit = line.split(", ");
+                //add the edge to the set
+                edges.add(new Edge(Integer.parseInt(lineSplit[0]), Integer.parseInt(lineSplit[1]), Float.parseFloat(lineSplit[2])*0.05f, Float.parseFloat(lineSplit[2]) ,false));
+                //read the next line
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        //return the set of edges
+        return edges;
+    }
 } 
 
 // Node class  

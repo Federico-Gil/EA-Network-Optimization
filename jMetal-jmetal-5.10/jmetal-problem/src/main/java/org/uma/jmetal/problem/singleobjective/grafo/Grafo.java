@@ -9,9 +9,11 @@ public class Grafo {
 	private Map<Integer, Set<Integer>> adjacencyList;
 	private boolean[] visited;
 	private static final float COST_PER_KILOMETER = 45000;
+	//posible edges
+	List<Edge> possibleEdges;
 
 	//the grafo constructor takes the number of vertices and the edges and creates the instance
-	public Grafo(Integer nVertices, Set<Edge> edges) {
+	public Grafo(Integer nVertices, Set<Edge> edges, List<Edge> possibleEdges) {
 		this.nVertices = nVertices;
 		this.edges = new HashSet<>(edges);
 		this.adjacencyList = new HashMap<>();
@@ -33,6 +35,8 @@ public class Grafo {
 			adjacencyList.get(edge.getV1()).add(edge.getV2());
 			adjacencyList.get(edge.getV2()).add(edge.getV1());
 		}
+
+		this.possibleEdges = possibleEdges;
 	}
 
 	//get and set methods
@@ -146,82 +150,6 @@ public class Grafo {
 	public void addEdge(Edge edge) {
 		edges.add(edge);
 	}
-
-	
-	/* Make a function that calculates the distance between two vertices in the graph 
-	 * as the sum of the cost of the edges between them, using dijkstra's algorithm
-	 * without the priority queue
-	 */
-	public double distance(int v1, int v2) {
-
-		//create an array to store the distance from the source vertex
-		double[] dist = new double[nVertices+1];
-		for (int i = 0; i <= nVertices; i++) {
-			dist[i] = Double.MAX_VALUE;
-		}
-		dist[v1] = 0;
-		
-		//create an array to store the previous vertex
-		int[] prev = new int[nVertices+1];
-		for (int i = 0; i <= nVertices; i++) {
-			prev[i] = -1;
-		}
-		
-		//create a set to store the vertices that have been visited
-		Set<Integer> visited = new HashSet<>();
-		
-		//create a set to store the vertices that have not been visited
-		Set<Integer> unvisited = new HashSet<>();
-		for (int i = 1; i <= nVertices; i++) {
-			unvisited.add(i);
-		}
-		
-		//while there are still unvisited vertices
-		while (!unvisited.isEmpty()) {
-			//get the vertex with the minimum distance from the source vertex
-			int min = getMin(unvisited, dist);
-			
-			//add the minimum vertex to the visited set
-			visited.add(min);
-			
-			//remove the minimum vertex from the unvisited set
-			unvisited.remove(min);
-			
-			//update the distances of the vertices adjacent to the minimum vertex
-			for (int v : adjacencyList.get(min)) {
-				if (!visited.contains(v)) {
-					double newDist = dist[min] + getEdge(min, v).getCost();
-					if (newDist < dist[v]) {
-						dist[v] = newDist;
-						prev[v] = min;
-					}
-				}
-			}
-		}
-		
-		//return the distance from the source vertex to the destination vertex
-		return dist[v2];
-	}
-	
-	//get the minimum distance vertex
-	private int getMin(Set<Integer> unvisited, double[] dist) {
-		int min = -1;
-		for (int v : unvisited) {
-			if (min == -1) min = v;
-			else if (dist[v] < dist[min]) min = v;
-		}
-		return min;
-	}
-
-	//get the edge between two vertices
-	private Edge getEdge(int v1, int v2) {
-		for (Edge edge : edges) {
-			if (edge.getV1() == v1 && edge.getV2() == v2) return edge;
-			if (edge.getV1() == v2 && edge.getV2() == v1) return edge;
-		}
-		return null;
-	}
-
 	
 	//funtion that returns a copy of the graph
 	public Grafo copy() {
@@ -229,7 +157,7 @@ public class Grafo {
 		for (Edge edge : edges) {
 			edgesCopy.add(edge.copy());
 		}
-		return new Grafo(nVertices, edgesCopy);
+		return new Grafo(nVertices, edgesCopy, possibleEdges);
 	}
 
 
@@ -243,20 +171,6 @@ public class Grafo {
 	 * 5. repeat steps 3 and 4 until the budget is reached 
 	 */
 	public BinarySet greedy(int budget) {
-		//posible edges
-		List<List<Integer>> posibleEdges;
-		posibleEdges = new ArrayList<List<Integer>>();
-		for (int i = 1; i <= nVertices; i++) {
-			for (int j = i+1; j <= nVertices; j++) {
-				List<Integer> edge = new ArrayList<Integer>();
-				edge.add(i);
-				edge.add(j);
-				// if the edge is not in the original graph, add it to the list of posible edges, without using contains
-				if (!edges.contains(new Edge(i,j,0f,0f,true))) {
-					posibleEdges.add(edge);
-				}
-			}
-		}
 
 		//calculate original edges size
 		int originalEdgesSize = edges.size();
@@ -306,8 +220,8 @@ public class Grafo {
 			
 			//find the position of the pair of vertices in the list of posible edges
 			int pos = -1;
-			for (int i = 0; i < posibleEdges.size(); i++) {
-				if (posibleEdges.get(i).get(0) == min1 && posibleEdges.get(i).get(1) == min2 || posibleEdges.get(i).get(0) == min2 && posibleEdges.get(i).get(1) == min1) {
+			for (int i = 0; i < possibleEdges.size(); i++) {
+				if (possibleEdges.get(i).getV1()== min1 && possibleEdges.get(i).getV2() == min2 || possibleEdges.get(i).getV1() == min2 && possibleEdges.get(i).getV2() == min1) {
 					pos = i;
 					break;
 				}
@@ -317,7 +231,7 @@ public class Grafo {
 			if (pos != -1) {
 				population.set(pos);
 				//update the budget
-				budget -= COST_PER_KILOMETER;
+				budget -= possibleEdges.get(pos).getCost()*COST_PER_KILOMETER;
 			}
 			
 			//update the degree of the vertices adjacent to the two vertices
@@ -327,9 +241,6 @@ public class Grafo {
 			for (int v : adjacencyList.get(min2)) {
 				degree.put(v, degree.get(v)+1);
 			}
-			
-			//update the budget
-			budget--;
 		}
 
 		return population;
@@ -343,5 +254,10 @@ public class Grafo {
 			population.add(greedy(budget));
 		}
 		return population;
+	}
+
+	//method of get possible edges
+	public List<Edge> getPossibleEdges() {
+		return possibleEdges;
 	}
 }

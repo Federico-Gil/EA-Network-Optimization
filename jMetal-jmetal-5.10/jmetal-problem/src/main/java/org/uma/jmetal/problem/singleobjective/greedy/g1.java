@@ -2,6 +2,7 @@ package org.uma.jmetal.problem.singleobjective.greedy;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,8 +21,9 @@ public class g1 {
 
     public static void main(String[] args) {
         //first we create the graph
-        Set<Edge> oEdges = readEdges("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/Network reliability optimization/data/24-nodes.csv");
-        Grafo grafo = new Grafo(24, oEdges);
+        Set<Edge> oEdges = readEdges("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodes.csv");
+        List<Edge> possibleEdges = readPossibleEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\costosPosibles.csv");
+        Grafo grafo = new Grafo(24, oEdges,possibleEdges);
         Set<Edge> newEdges = new HashSet<>();
 
         //then we set the max cost
@@ -133,4 +135,30 @@ public class g1 {
 		//return the set of edges
 		return edges;
 	}
+
+     //method that reads the possible edges from a csv file
+     public static java.util.List<Edge> readPossibleEdges(String fileName) {
+        //create a list of edges
+        java.util.List<Edge> edges = new java.util.ArrayList<>();
+
+        //read the file
+        try {
+            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(fileName));
+            String line = reader.readLine();
+            while (line != null) {
+                //split the line into the vertices and the probability
+                String[] lineSplit = line.split(", ");
+                //add the edge to the set
+                edges.add(new Edge(Integer.parseInt(lineSplit[0]), Integer.parseInt(lineSplit[1]), Float.parseFloat(lineSplit[2])*0.05f, Float.parseFloat(lineSplit[2]) ,false));
+                //read the next line
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        //return the set of edges
+        return edges;
+    }
 }

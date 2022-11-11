@@ -36,13 +36,13 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 	private static final float COST_PER_KILOMETER = 45000;
 	private static final int PRESUPUESTO = 1000000;
 
-	private static final int MAX_EVALUATIONS = 15000;
+	private static final int MAX_EVALUATIONS = 25000;
 	private static final int POPULATION_SIZE = 100;
 	private static final float CROSSOVER_PROBABILITY = 0.9f;
 	private static final float MUTATION_MULTIPLIER = 1.0f;
 
-	private static final int CANTIDAD_DE_NODOS = 118;
-	private static final String NOMBRE_ARCHIVO = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/118-nodesWc.csv";
+	private static final int CANTIDAD_DE_NODOS = 24;
+	private static final String NOMBRE_ARCHIVO = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv";
 
   /**
    * Usage: java org.uma.jmetal.runner.singleobjective.GenerationalGeneticAlgorithmBinaryEncodingRunner
@@ -54,8 +54,9 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
     MutationOperator<BinarySolution> mutation;
     SelectionOperator<List<BinarySolution>, BinarySolution> selection;
 	Set<Edge> edges = readEdges(NOMBRE_ARCHIVO);
+	List<Edge> possibleEdges = readPossibleEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\costosPosibles.csv");
 
-    problem = new NOBinaryNuevoFitness(CANTIDAD_DE_NODOS,edges) ; // esto es lo que se cambia para probar el nuevo fitness
+    problem = new NOBinaryNuevoFitness(CANTIDAD_DE_NODOS, edges, possibleEdges) ; // esto es lo que se cambia para probar el nuevo fitness
 
     //crossover = new HUXCrossover(0.95) ;
 	crossover = new HUXCrossover(CROSSOVER_PROBABILITY);
@@ -97,49 +98,28 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
   
   private static void validate(BinarySolution solution, NOBinaryNuevoFitness problem) {
 	  Grafo grafo; 
-	  Set<Edge> asd = readEdges("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/118-nodesWc.csv");
-	  grafo = new Grafo(118,asd);
+	  Set<Edge> asd = readEdges("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv");
+	  List<Edge> possibleEdges = readPossibleEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\costosPosibles.csv");
+	  grafo = new Grafo(24, asd, possibleEdges);
+
+	  problem.saveBestIndividuals("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\bestIndividuals.csv", possibleEdges);
 	  
 	  Grafo gt = grafo.copy();
 	  
 	  //aristas del grafo original
-	  Set<Edge> e1 =  grafo.getEdges();
 	  Set<Edge> nuevasAristas = new java.util.HashSet<>();
 	  BitSet bitset = solution.getVariable(0) ;
 	  
-	  ArrayList<List<Integer>> posibleEdges;
-	  int numberOfNodes = grafo.getnVertices();
-	  posibleEdges = new ArrayList<List<Integer>>();
-	  for (int i = 1; i <= numberOfNodes; i++) {
-		  for (int j = i+1; j <= numberOfNodes; j++) {
-			  List<Integer> edge = new ArrayList<Integer>();
-			  edge.add(i);
-			  edge.add(j);
-			  // if the edge is not in the original graph, add it to the list of posible edges, without using contains
-			  if (!e1.contains(new Edge(i,j,0f,0f,true))) {
-				  posibleEdges.add(edge);
-			  }
-		  }
-	  }
 
 	  //for each bit in the bitset, if it is 1, add the corresponding edge to the graph else add the edge with exists = false
 	  for (int i = 0; i < bitset.length(); i++) {
 		if (bitset.get(i)) {
-			/*
-			int x = posibleEdges.get(i).get(0);
-			int y = posibleEdges.get(i).get(1);
-
-			if (!asd.contains(new Edge(x,y,0f,0f,true))) {
-				float d = (float) gt.distance(x, y);
-				Edge e = new Edge(x,y,0.05, d*0.7,true);
-				*/
-				Edge e = new Edge(posibleEdges.get(i).get(0),posibleEdges.get(i).get(1),0.05f,1.0f,true);
+				Edge e = new Edge(possibleEdges.get(i).getV1(),possibleEdges.get(i).getV2(),possibleEdges.get(i).getCost()*0.05f,possibleEdges.get(i).getCost(),true);
 				nuevasAristas.add(e);
 				gt.addEdge(e);
 			}
 		}
 		
-	  
 	  long costoOriginal = 0L;
 	  long costoNuevo = 0L;
 	  
@@ -178,24 +158,6 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 			err1.printStackTrace();
 		}
   	}
-
-  /*  
-	  currentEvaluation++;
-	  Grafo gt = new Grafo(numberOfNodes,aristasOriginales);
-	  Set<Edge> nuevasAristas = new java.util.HashSet<>();
-	  BitSet bitset = solution.getVariable(0) ;
-	  
-
-	  
-	  int cantAristasNuevo = nuevasAristas.size();
-	  long costoUpdate = 0L;
-	  
-	  costoUpdate += cantAristasNuevo*450000L; 
-	  
-	  //System.out.println("Nuevas aristas: " + (cantAristasNuevo-cantAristasOriginal) + " Estas son: " + nuevasAristas);
-	  double R = gt.monteCarlo((int) 1e3, 0.05f)[0];
-	  double fitness = Math.abs(presupuesto - costoUpdate)*(1/R);
-   */
   
   public static java.util.Set<Edge> readEdges(String fileName) {
 		//create a set of edges
@@ -221,12 +183,30 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 		//return the set of edges
 		return edges;
 	}
-  
-  public static int[] proy(int i) {
-	  int x,y;
-	  x = Math.floorDiv(i, 24);	
-	  y = Math.floorMod(i, 24);
-	  //System.out.println("i: " + i + " --- x: " + (x+1) + " y: " + (y+1));
-	  return new int[]{x+1,y+1};
-  }  
+
+	 //method that reads the possible edges from a csv file
+	 public static java.util.List<Edge> readPossibleEdges(String fileName) {
+        //create a list of edges
+        java.util.List<Edge> edges = new java.util.ArrayList<>();
+
+        //read the file
+        try {
+            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(fileName));
+            String line = reader.readLine();
+            while (line != null) {
+                //split the line into the vertices and the probability
+                String[] lineSplit = line.split(", ");
+                //add the edge to the set
+                edges.add(new Edge(Integer.parseInt(lineSplit[0]), Integer.parseInt(lineSplit[1]), Float.parseFloat(lineSplit[2])*0.05f, Float.parseFloat(lineSplit[2]) ,false));
+                //read the next line
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        //return the set of edges
+        return edges;
+    }
 }
