@@ -33,16 +33,16 @@ import java.util.Set;
  * @author Antonio J. Nebro <antonio@lcc.uma.es>
  */
 public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
-	private static final float COST_PER_KILOMETER = 45000;
-	private static final int PRESUPUESTO = 1000000;
+	private static final float COST_PER_KILOMETER = 87310;
+	private static final int PRESUPUESTO = 4000000;
 
 	private static final int MAX_EVALUATIONS = 25000;
 	private static final int POPULATION_SIZE = 100;
 	private static final float CROSSOVER_PROBABILITY = 0.9f;
 	private static final float MUTATION_MULTIPLIER = 1.0f;
 
-	private static final int CANTIDAD_DE_NODOS = 24;
-	private static final String NOMBRE_ARCHIVO = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv";
+	private static final int CANTIDAD_DE_NODOS = 54;
+	private static final String NOMBRE_ARCHIVO = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/54-nodesWc.csv";
 
   /**
    * Usage: java org.uma.jmetal.runner.singleobjective.GenerationalGeneticAlgorithmBinaryEncodingRunner
@@ -54,7 +54,7 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
     MutationOperator<BinarySolution> mutation;
     SelectionOperator<List<BinarySolution>, BinarySolution> selection;
 	Set<Edge> edges = readEdges(NOMBRE_ARCHIVO);
-	List<Edge> possibleEdges = readPossibleEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\costosPosibles.csv");
+	List<Edge> possibleEdges = readPossibleEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\costosPosibles54.csv");
 
     problem = new NOBinaryNuevoFitness(CANTIDAD_DE_NODOS, edges, possibleEdges) ; // esto es lo que se cambia para probar el nuevo fitness
 
@@ -98,9 +98,9 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
   
   private static void validate(BinarySolution solution, NOBinaryNuevoFitness problem) {
 	  Grafo grafo; 
-	  Set<Edge> asd = readEdges("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/24-nodesWc.csv");
-	  List<Edge> possibleEdges = readPossibleEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\costosPosibles.csv");
-	  grafo = new Grafo(24, asd, possibleEdges);
+	  Set<Edge> asd = readEdges("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/54-nodesWc.csv");
+	  List<Edge> possibleEdges = readPossibleEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\costosPosibles54.csv");
+	  grafo = new Grafo(54, asd, possibleEdges);
 
 	  problem.saveBestIndividuals("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\bestIndividuals.csv", possibleEdges);
 	  

@@ -29,9 +29,9 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	private static final Integer PRESUPUESTO = 1000000;
 	private int cantidadAristasOriginales;
 	private int currentEvaluation;
-	private static final float COST_PER_KILOMETER = 45000;
-	private static final float ALPHA = 0.25f; //12420000.0f
-	private static final float BETA = 0.75f;
+	private static final float COST_PER_KILOMETER = 87310;
+	private static final float ALPHA = 0.75f; //12420000.0f
+	private static final float BETA = 0.25f;
 	private double cMax;
 
 	private static final Integer POPULATION_SIZE = 100;
@@ -100,10 +100,8 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 			solution = greedy(PRESUPUESTO);
 		} while (greedyIndividuals.contains(solution));
 		greedyIndividuals.add(solution);
-		System.out.println(solution.getVariable(0));
 		return solution;
 	} else {
-		System.out.println("random solution");
 		return new DefaultBinarySolution(getListOfBitsPerVariable(), getNumberOfObjectives()) ;
 	}
   }
@@ -229,7 +227,8 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 		  n = 10000;
 	  } */
 	  
-	  double R = gt.monteCarlo((int) 1e3, 0.05f)[0];
+	  //18444 para un delta = 0.05 y eps 0.01
+	  double R = gt.monteCarlo((int) 18444, 0.05f)[0];
 	  double fitness = ALPHA*costoUpdate/cMax + BETA*(1.0f/R);
 
 	  //if the budget is exceeded, the fitness is set to 
