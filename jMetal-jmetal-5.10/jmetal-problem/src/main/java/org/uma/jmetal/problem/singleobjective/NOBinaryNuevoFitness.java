@@ -26,15 +26,15 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	private Set<Edge> aristasOriginales;
 	private List<Edge> aristasPosibles;
 	private int bits ;
-	private static final Integer PRESUPUESTO = 1000000;
+	private static final Integer PRESUPUESTO = 4000000;
 	private int cantidadAristasOriginales;
 	private int currentEvaluation;
 	private static final float COST_PER_KILOMETER = 87310;
-	private static final float ALPHA = 0.75f; //12420000.0f
-	private static final float BETA = 0.25f;
+	private static final float ALPHA = 0.5f; //12420000.0f
+	private static final float BETA = 0.5f;
 	private double cMax;
 
-	private static final Integer POPULATION_SIZE = 100;
+	private static final Integer POPULATION_SIZE = 20;
 
 	//set of BinarySolutions to store the created individuals
 	private List<BinarySolution> greedyIndividuals = new ArrayList<BinarySolution>();
@@ -196,6 +196,86 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	return individual;
 }
 
+//greedy2 is the same as greedy, but instead of calculating the degree of each vertex, it calculates the probability of each vertex to be disconnected which is the product of each edge weight
+public BinarySolution greedy2(int budget) {
+	Set<Edge> edges = aristasOriginales;
+	Integer nVertices = numberOfNodes;
+
+	Grafo g = new Grafo(nVertices, edges,aristasPosibles);
+
+	Map<Integer, Double> prob = new HashMap<Integer, Double>();
+	for (int i = 1; i <= nVertices; i++) {
+		prob.put(i,1.0);
+	}
+
+	for (Edge e : g.getEdges()) {
+		if (e.getExists()){
+			prob.put(e.getV1(), prob.get(e.getV1())*(e.getWeight()));
+			prob.put(e.getV2(), prob.get(e.getV2())*(e.getWeight()));
+		}
+	}
+
+	//print the probability of each vertex
+	for (int i = 1; i <= nVertices; i++) {
+		System.out.println("Probabilidad de " + i + ": " + prob.get(i));
+	}
+
+	while (budget - COST_PER_KILOMETER > 0) {
+		//find the two vertices with the highest probability that are not the same
+		double max1 = 0;
+		double max2 = 0;
+		int v1 = 0;
+		int v2 = 0;
+		for (int i = 1; i <= nVertices; i++) {
+			if (prob.get(i) > max1) {
+				max2 = max1;
+				v2 = v1;
+				max1 = prob.get(i);
+				v1 = i;
+			} else if (prob.get(i) > max2) {
+				max2 = prob.get(i);
+				v2 = i;
+			}
+		}
+
+		Edge e = null;
+		for (Edge edge : aristasPosibles) {
+			if ((edge.getV1() == v1 && edge.getV2() == v2) || (edge.getV1() == v2 && edge.getV2() == v1)) {
+				e = edge;
+				break;
+			}
+		}
+
+		if (e != null) {
+			g.addEdge(new Edge(e.getV1(), e.getV2(), e.getWeight(), e.getCost(), true));
+
+			prob.put(v1, prob.get(v1)*(1-e.getWeight())); //ojo
+			prob.put(v2, prob.get(v2)*(1-e.getWeight()));
+
+			budget -= e.getCost()*COST_PER_KILOMETER;
+		}
+
+		budget--;
+	}
+
+	BinarySolution individual = new DefaultBinarySolution(getListOfBitsPerVariable(), getNumberOfObjectives());
+
+	Set<Edge> edgesResult = g.getEdges();
+
+	for (int i = 0; i < bits; i++) {
+		individual.getVariable(0).set(i, false); //ojo
+	}
+
+	int i = 0;
+	for (Edge edge : aristasPosibles) {
+		if (edgesResult.contains(edge)) {
+			individual.getVariable(0).set(i);
+		}
+		i++;
+	}
+	return individual;
+}
+
   /** Evaluate() method */
 	//funcion de fitness
   @Override
@@ -228,7 +308,7 @@ public class NOBinaryNuevoFitness extends AbstractBinaryProblem {
 	  } */
 	  
 	  //18444 para un delta = 0.05 y eps 0.01
-	  double R = gt.monteCarlo((int) 18444, 0.05f)[0];
+	  double R = gt.monteCarlo((int) 1e3, 0.05f)[0];
 	  double fitness = ALPHA*costoUpdate/cMax + BETA*(1.0f/R);
 
 	  //if the budget is exceeded, the fitness is set to 

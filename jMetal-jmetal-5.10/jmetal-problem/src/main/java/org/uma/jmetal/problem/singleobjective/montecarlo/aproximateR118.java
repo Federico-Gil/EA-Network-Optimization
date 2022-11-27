@@ -23,7 +23,7 @@ public class aproximateR118 {
 		/////////////
 
 		/* eps = 0.001, delta = 0.01 n= 2649158 */
-		double[] results = graph.monteCarlo((int) 1e5, (float) 0.01);
+		double[] results = graph.monteCarlo((int) 2649158, (float) 0.01);
 
 		Instant end = Instant.now();
 		/////////////

@@ -17,19 +17,19 @@ def main():
     for line in file:
         line = line.split(", ")
 
-        G.add_edge(line[0], line[1], color='black', weight=float(line[2])*10.0, distance=float(line[3]))
+        G.add_edge(line[0], line[1], color='black', weight=float(line[2])*5.0, distance=float(line[3]))
 
     
     colors = nx.get_edge_attributes(G,'color').values()
     weights = nx.get_edge_attributes(G,'weight').values()
-    distances = nx.get_edge_attributes(G,'distance').values()
     
     pos = nx.spring_layout(G)
+
     nx.draw(G, pos, 
             edge_color=colors, 
             width=list(weights),
             with_labels=True,
-            node_color='lightgreen')
+            node_color='grey',style='dashed')
 
 
     #save the graph as an image in the same folder as the data
@@ -40,10 +40,11 @@ def main():
     #plt.savefig("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/Network reliability optimization/data/OriginalGraph.png")
 
     #now read other file and add the edges to the graph with a different color (red)
-    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/newEdges.csv"
+    file = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/newEdges541.csv"
     file = open(file, "r")
     for line in file:
         line = line.split(", ")
+        #the edge added will be a full line.
         G.add_edge(line[0], line[1], color='red', weight=float(line[2])*30.0)
     #draw the graph
     """
@@ -61,7 +62,7 @@ def main():
             edge_color=colors, 
             width=list(weights),
             with_labels=True,
-            node_color='lightgreen')
+            node_color='grey',style='dashed')
 
     #save the graph as an image in the same folder as the data
     plt.savefig("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/GraphWithNewEdges.png")

@@ -1,7 +1,5 @@
 package org.uma.jmetal.problem.singleobjective.greedy;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.BitSet;
 
 import java.util.List;
@@ -13,16 +11,9 @@ import org.uma.jmetal.problem.singleobjective.grafo.Edge;
 import org.uma.jmetal.problem.singleobjective.grafo.Grafo;
 import org.uma.jmetal.solution.binarysolution.BinarySolution;
 
-public class g1 {
-    //this is a greedy algorithm that does the following:
-    //1. It takes the graph, and P the max cost. And calculates the degree of each vertex and stores it in a map
-    //while cost < P
-    //2. It takes the two vertices with the lowest degree and adds an edge between them
-    //3. It updates the degree of the vertices that are connected to the two vertices
-    //4. It updates the cost
-
+public class g2 {
     private static final float COST_PER_KILOMETER = 87310;
-	private static final int PRESUPUESTO = 4000000;
+	private static final int PRESUPUESTO = 5000000;
 	private static final int CANTIDAD_DE_NODOS = 118;
 	private static final String NOMBRE_ARCHIVO = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/118-nodesWc.csv";
 
@@ -35,13 +26,12 @@ public class g1 {
 
     problem = new NOBinaryNuevoFitness(CANTIDAD_DE_NODOS, edges, possibleEdges) ; // esto es lo que se cambia para probar el nuevo fitness
 
-    //run this 20 times
-    for (int i = 0; i < 20; i++){
-        BinarySolution solution = ((NOBinaryNuevoFitness) problem).greedy(PRESUPUESTO); 
-        validate(solution, (NOBinaryNuevoFitness) problem);
-    }
+	BinarySolution solution = ((NOBinaryNuevoFitness) problem).greedy2(PRESUPUESTO); 
+	//print the solution
+	System.out.println("Solution: " + solution.getVariable(0));
+	validate(solution, (NOBinaryNuevoFitness) problem);
 
-  }  
+  }
   
   private static void validate(BinarySolution solution, NOBinaryNuevoFitness problem) {
 	  Grafo grafo; 
@@ -78,10 +68,14 @@ public class g1 {
 		  costoNuevo += e.getCost()*COST_PER_KILOMETER;
 	  }	  
 
-	  //System.out.println("Nuevas aristas: " + (cantAristasNuevo-cantAristasOriginal) + " Estas son: " + nuevasAristas);
-	  double R = gt.monteCarlo((int) 18444, 0.05f)[0];
+	  double[] R = gt.monteCarlo((int) 2649158,0.01f);
+
+	  //print the monte carlo results
+	  System.out.println("Confiabilidad: " + R[0]);
+	  System.out.println("IDC: " + R[1] + ", " + R[2]);	  
+
 	  //print the porcentage of the money that is going to be used
-	  System.out.println((costoNuevo-costoOriginal)*100.0/PRESUPUESTO + ","+R);
+	  System.out.println((costoNuevo-costoOriginal)*100.0/PRESUPUESTO + ","+R[0]);
   	}
   
   public static java.util.Set<Edge> readEdges(String fileName) {

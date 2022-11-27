@@ -23,16 +23,10 @@ public class aproximateR24 {
 		//create the graph
 		Grafo graph = new Grafo(nVertices, edgesSet,possibleEdges);
 		graph = graph.updateSample();
-		Map<Integer, Set<Integer>> adjList = graph.getAdjacencyList();
-
-		//print the adjacency list
-		for (int i = 1; i < adjList.size(); i++) {
-			System.out.println("Node " + i + " is connected to: " + adjList.get(i));
-		}
 		
 		double[] results = null;
 		for (int i = 0; i < 10; i++) {
-			results = graph.monteCarlo((int) 1e3, (float) 0.05);					
+			results = graph.monteCarlo((int) 1e6, (float) 0.05);					
 		}
 		
 		System.out.println("The probability of the graph being connected is: " + results[0]);

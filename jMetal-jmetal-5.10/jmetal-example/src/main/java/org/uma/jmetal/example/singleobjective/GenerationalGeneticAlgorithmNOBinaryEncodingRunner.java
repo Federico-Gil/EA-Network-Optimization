@@ -5,6 +5,8 @@ import org.uma.jmetal.algorithm.singleobjective.geneticalgorithm.GeneticAlgorith
 import org.uma.jmetal.example.AlgorithmRunner;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
 import org.uma.jmetal.operator.crossover.impl.HUXCrossover;
+import org.uma.jmetal.operator.crossover.impl.SinglePointCrossover;
+import org.uma.jmetal.operator.crossover.impl.TwoPointCrossover;
 import org.uma.jmetal.operator.mutation.MutationOperator;
 import org.uma.jmetal.operator.mutation.impl.BitFlipMutation;
 import org.uma.jmetal.operator.selection.SelectionOperator;
@@ -36,10 +38,10 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 	private static final float COST_PER_KILOMETER = 87310;
 	private static final int PRESUPUESTO = 4000000;
 
-	private static final int MAX_EVALUATIONS = 25000;
-	private static final int POPULATION_SIZE = 100;
-	private static final float CROSSOVER_PROBABILITY = 0.9f;
-	private static final float MUTATION_MULTIPLIER = 1.0f;
+	private static final int MAX_EVALUATIONS = 30000;
+	private static final int POPULATION_SIZE = 20;
+	private static final float CROSSOVER_PROBABILITY = 0.60f;
+	private static final float MUTATION_MULTIPLIER = 0.001f;
 
 	private static final int CANTIDAD_DE_NODOS = 54;
 	private static final String NOMBRE_ARCHIVO = "C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/54-nodesWc.csv";
@@ -59,9 +61,10 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
     problem = new NOBinaryNuevoFitness(CANTIDAD_DE_NODOS, edges, possibleEdges) ; // esto es lo que se cambia para probar el nuevo fitness
 
     //crossover = new HUXCrossover(0.95) ;
+	//create a 2 point crossover
 	crossover = new HUXCrossover(CROSSOVER_PROBABILITY);
 
-    double mutationProbability = 1.0*MUTATION_MULTIPLIER / problem.getBitsFromVariable(0);
+    double mutationProbability = MUTATION_MULTIPLIER;
     mutation = new BitFlipMutation(mutationProbability) ;
 
     selection = new BinaryTournamentSelection<BinarySolution>();
@@ -102,7 +105,7 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 	  List<Edge> possibleEdges = readPossibleEdges("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\costosPosibles54.csv");
 	  grafo = new Grafo(54, asd, possibleEdges);
 
-	  problem.saveBestIndividuals("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\bestIndividuals.csv", possibleEdges);
+	  problem.saveBestIndividuals("C:\\Users\\Fede\\Desktop\\AE\\EA-Network-Optimization\\data\\bestIndividuals54.csv", possibleEdges);
 	  
 	  Grafo gt = grafo.copy();
 	  
@@ -147,7 +150,7 @@ public class GenerationalGeneticAlgorithmNOBinaryEncodingRunner {
 
 	  //save the new edges to a csv file
 	  try {
-		FileWriter writer = new FileWriter("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/newEdges.csv");
+		FileWriter writer = new FileWriter("C:/Users/Fede/Desktop/AE/EA-Network-Optimization/data/newEdges54.csv");
 		for(Edge e : nuevasAristas) {
 			writer.append(e.toCsv());
 			writer.append("\n");
